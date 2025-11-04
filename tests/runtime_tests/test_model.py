@@ -1,3 +1,9 @@
+"""
+Quick check used in workflow.py to ensure that the model's dimensions are correct.
+
+Author: Emily Guan
+"""
+
 import numpy as np
 
 def check_model(model):

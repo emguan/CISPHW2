@@ -1,15 +1,21 @@
+"""
+Pivot calibration for EM probe using distortion correction.
+
+Author: Emily Guan
+"""
+
 import numpy as np
 from utils.mathpackage.bernstein import bernstein_out
 from utils.IO.read import read_empivot
-from utils.mathpackage.rigid_transform import aruns_method  # returns object with .r (3x3), .p (3,)
+from utils.mathpackage.rigid_transform import aruns_method
 from utils.helpers.converters import arr_to_points, rot_to_arr, frames_to_array
 
+"""Return distortion-corrected empivot frames"""
 def distortion_pivot(model, empivot_file):
-    """Return distortion-corrected EMPIVOT frames as (Nf, NB, 3)."""
     frames, NB, Nf = read_empivot(empivot_file)
-    raw = frames_to_array(frames)                     # (Nf, NB, 3)
-    corr = bernstein_out(model, raw.reshape(-1, 3))    # (Nf*NB, 3)
-    corr = corr.reshape(raw.shape)                     # (Nf, NB, 3)
+    raw = frames_to_array(frames)
+    corr = bernstein_out(model, raw.reshape(-1, 3))
+    corr = corr.reshape(raw.shape)
     return corr
 
 def pivot_calibration(R_list: list[np.ndarray], t_list: list[np.ndarray]):

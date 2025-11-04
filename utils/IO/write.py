@@ -30,9 +30,9 @@ def write_expected_2(name: str, C_pred_list: list):
     path = "./output2/" + name
     with open(path, "w") as f:
         f.write(f"{Nframes}, {name}\n")
-        for k, Ck in enumerate(C_pred_list):
-            for row in Ck:
-                f.write(f"{row[0]:.2f},{row[1]:.2f},{row[2]:.2f}\n")
+        for k, row in enumerate(C_pred_list):
+            print(row)
+            f.write(f"{row[0]:.2f},{row[1]:.2f},{row[2]:.2f}\n")
 
 
                 

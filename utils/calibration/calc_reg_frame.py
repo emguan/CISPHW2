@@ -1,47 +1,46 @@
+"""
+Calculating registration frame for step 5 of workflow.
+
+Author: Emily Guan
+"""
+
 import numpy as np
-from utils.mathpackage.rigid_transform import aruns_method  # returns Transformations(.r, .p)
-from utils.helpers.converters import arr_to_points          # (N,3) -> list[Points]
+
+from utils.mathpackage.rigid_transform import aruns_method
+from utils.helpers.converters import arr_to_points
 from utils.IO.read import read_ctfiducials
 from utils.mathpackage.mathpackage import Transformations, Rotations, Points
 
-def register_em_to_ct(B_em: np.ndarray, ct_file: str):
+"""
+Registers EM fiducials to CT fiducials read from ctfid_file.
+Returns (F_em2ct, F_ct2em, rms) where rms is computed on those two sets.
+"""
+def register_em_to_ct(B_em: np.ndarray, ctfid_file: str):
+
+    B_em = np.asarray(B_em, float)
+    assert B_em.ndim == 2 and B_em.shape[1] == 3, f"B_em bad shape {B_em.shape}"
+
+    ct_read = read_ctfiducials(ctfid_file)
+    C_ct = np.array([p.points_3d() for p in ct_pts], dtype=float)
+    assert C_ct.shape == B_em.shape, f"Shape mismatch: B_em {B_em.shape} vs C_ct {C_ct.shape}"
+
+    T = aruns_method(arr_to_points(B_em), arr_to_points(C_ct))
+    R = np.asarray(T.r.R, dtype=float)
+    t = np.asarray(T.p.points_3d(), dtype=float).reshape(3)
+
+    # transforms
+    F_em2ct = Transformations("em to ct", Rotations(R), Points("pt", t[0], t[1],t[2]))
+    R_inv = R.T
+    t_inv = -R_inv @ t
+    F_ct2em = Transformations("ct to em", Rotations(R_inv), Points("pt", t_inv[0], t_inv[1], t_inv[2])) # backwards ct2em is reverse of forward em2ct
+
+    # rms
+    C_pred = (B_em @ R.T) + t
+    residuals = np.linalg.norm(C_pred - C_ct, axis=1)
+    rms = float(np.sqrt(np.mean(residuals**2)))
+
+    """print("[reg] t:", t, "rms:", rms)
+    print(f"[reg] residuals: min={residuals.min():.4f}, med={np.median(residuals):.4f}, max={residuals.max():.4f}") 
     """
-    Compute EM->CT registration using matched fiducials.
-
-    Args:
-      B_em   : (M,3) EM-base fiducials (averaged per physical fid)
-      ct_file: path to CT fiducials file
-
-    Returns:
-      R_em2ct, t_em2ct, R_ct2em, t_ct2em, rms
-    """
-    # Load CT fiducials (list[Points]) and count
-    ct_pts, Nc = read_ctfiducials(ct_file)   # adjust if your read returns only the list
-
-    # Convert CT fiducials to ndarray for error calc
-    C_ct = np.array([p.points_3d() for p in ct_pts], dtype=float)  # (M,3)
-
-    if B_em.shape != C_ct.shape or B_em.shape[1] != 3:
-        raise ValueError(f"Shape mismatch: B_em {B_em.shape} vs C_ct {C_ct.shape}. Need (M,3) each in same order.")
-
-    # Arun/Kabsch expects list[Points]; B_em is ndarray, CT is already Points list
-    T = aruns_method(arr_to_points(B_em), ct_pts)  # C ≈ R B + t
-
-    R_em2ct = np.asarray(T.r.R, dtype=float)           # (3,3)
-    t_em2ct = np.asarray(T.p.points_3d(), dtype=float) # (3,)
-
-    # Inverse (CT -> EM)
-    R_ct2em = R_em2ct.T
-    t_ct2em = -R_ct2em @ t_em2ct
-
-    # RMS registration error
-    C_pred = (B_em @ R_em2ct.T) + t_em2ct
-    errs = np.linalg.norm(C_pred - C_ct, axis=1)
-    rms = float(np.sqrt(np.mean(errs**2)))
-
-    F_em2ct = Transformations("em to ct", Rotations(R_em2ct), Points(t_em2ct))
-
-    F_ct2em = Transformations("ct to em", Rotations(R_ct2em), Points(t_ct2em))
-    #print(rms) # 0.0048232900879437764
-
-    return F_em2ct ,F_ct2em, rms
+    
+    return F_em2ct, F_ct2em, rms

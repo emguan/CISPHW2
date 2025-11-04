@@ -17,11 +17,9 @@ from utils.IO.write import write_expected_1
 from utils.mathpackage.mathpackage import Transformations, Points, Rotations
 from utils.mathpackage.rigid_transform import aruns_method
 
-'''
-Main executing function of file, takes in calibration bodies and frames, and makes predicted C using Arun's method.
-
-Note: Arun's method is implemented under registration.py.
-'''
+"""
+Runs execution of Arun's method (defined in rigid_transform)
+"""
 def run(d, a, c,
               D_frames: list[np.ndarray],
               A_frames: list[np.ndarray]) :
@@ -67,13 +65,18 @@ def print_error(C_frames, C_pred):
         dists = np.linalg.norm(diffs, axis=1)  #euclidean error
         per_frame_means.append(dists.mean())
         per_frame_rms.append(np.sqrt(np.mean(dists**2))) #RMS error
-        #print(f"Frame {i:03d}: mean_err = {dists.mean():.6f} mm   rms = {np.sqrt(np.mean(dists**2)):.6f} mm")
+        print(f"Frame {i:03d}: mean_err = {dists.mean():.6f} mm   rms = {np.sqrt(np.mean(dists**2)):.6f} mm")
 
     overall_mean = float(np.mean(per_frame_means))
     overall_rms  = float(np.mean(per_frame_rms))
-    #print(f"overall mean error = {overall_mean:.6f} mm")
-    #print(f"overall RMS error  = {overall_rms:.6f} mm")
+    print(f"overall mean error = {overall_mean:.6f} mm")
+    print(f"overall RMS error  = {overall_rms:.6f} mm")
 
+'''
+Main executing function of file, takes in calibration bodies and frames, and makes predicted C using Arun's method.
+
+Note: Arun's method is implemented under rigid_transform.py.
+'''
 def calibrate(calbody_file, calreadings_file):
 
     filetype = calbody_file.split('-')[1]
