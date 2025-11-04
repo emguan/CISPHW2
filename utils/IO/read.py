@@ -137,11 +137,8 @@ def read_ctfiducials(filepath):
         NB = int(parts[0])
 
         for frame in range(NB):
-            B_list = []
-            for i in range(NG):
-                x, y, z = read_xyz(f.readline())
-                B_list.append(Points("CT Fiducials", x, y, z))
-            b_coords.append(B_list)
+            x, y, z = read_xyz(f.readline())
+            b_coords.append(Points("CT Fids", x, y, z))
 
     return b_coords, NB
 
@@ -167,7 +164,7 @@ def read_emfiducials(filepath):
 """
 Reads test points from EM.
 """
-def read_emfiducials(filepath):
+def read_emnav(filepath):
     B_frames = []
     with open(filepath, 'r') as f:
         # header = NG, Nframes, filename
@@ -178,7 +175,7 @@ def read_emfiducials(filepath):
             B_list = []
             for i in range(NB):
                 x, y, z = read_xyz(f.readline())
-                B_list.append(Points("EM Fiducials", x, y, z))
+                B_list.append(Points("EM Navigation Points", x, y, z))
             B_frames.append(B_list)
 
     return B_frames, NB, Nframes

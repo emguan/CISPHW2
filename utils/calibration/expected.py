@@ -11,7 +11,7 @@ import argparse
 import os
 import numpy as np
 
-from utils.helpers.arr_to_points import arr_to_points
+from utils.helpers.converters import arr_to_points
 from utils.IO.read import read_calbody, read_calreadings
 from utils.IO.write import write_expected_1
 from utils.mathpackage.mathpackage import Transformations, Points, Rotations
