@@ -36,11 +36,11 @@ def compute_nav_tip_ct(model, emnav_file, B0_points, b_tip, F_reg):
         T = aruns_method(B0_points, arr_to_points(corr[k])) # body -> EM base
         Rk = np.asarray(T.r.R, float)
         tk = np.asarray(T.p.points_3d(), float)
-        tips_em[k] = Rk @ b_tip + tk
+        tips_em[k] = b_tip @ Rk.T + tk
 
     # 3) Apply F_reg (EM->CT)
     R_reg, t_reg = F_reg.r.R, F_reg.p.points_3d()
-    print(R_reg)
+    #print(R_reg)
     tips_ct = (tips_em @ R_reg.T) + t_reg
 
     return tips_em, tips_ct

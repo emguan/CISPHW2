@@ -8,6 +8,8 @@ Author: Emily Guan
 """
 import argparse
 
+from tests.runtime_tests.test_model import check_model
+from tests.runtime_tests.test_calibrate import check_pred
 from utils.calibration.expected import calibrate
 from utils.mathpackage.mathpackage import Points, Rotations, Transformations
 
@@ -31,11 +33,13 @@ from utils.calibration.navigation import compute_nav_tip_ct
 
 def main(calbody_file, calreadings_file, ctfid_file, emfid_file, emnav_file, empivot_file):
 
-    # step 1: find c_exp
+    # step 1: find c_exp - works
     C_actual, C_pred = calibrate(calbody_file, calreadings_file)
+    check_pred(C_actual, C_pred)
 
     # step 2: find distortion function
     model = fit_bernstein_3d(C_actual, C_pred)
+    check_model(model)
 
     # step 3: pivot calibration for EM probe
     b_tip, b_post, score, B0, R_list, t_list = calibrate_pivot(model, empivot_file)

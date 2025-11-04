@@ -25,7 +25,7 @@ def pivot_calibration(R_list: list[np.ndarray], t_list: list[np.ndarray]):
     b_tip  = x[0:3, 0]
     b_post = x[3:6, 0]
     score = float(np.sqrt(res[0] / pts)) if res.size > 0 else float(np.sqrt(np.mean((A @ x - b)**2)))
-    print(f"RES SCORE PIVOT: {score:.6f}")
+    #print(f"RES SCORE PIVOT: {score:.6f}")
     return b_tip, b_post, score
 
 def calibrate_pivot(model, empivot_file):

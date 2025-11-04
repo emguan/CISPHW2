@@ -42,6 +42,6 @@ def register_em_to_ct(B_em: np.ndarray, ct_file: str):
     F_em2ct = Transformations("em to ct", Rotations(R_em2ct), Points(t_em2ct))
 
     F_ct2em = Transformations("ct to em", Rotations(R_ct2em), Points(t_ct2em))
-    print(rms) # 0.0048232900879437764
+    #print(rms) # 0.0048232900879437764
 
     return F_em2ct ,F_ct2em, rms

@@ -8,8 +8,6 @@ from utils.helpers.converters import arr_to_points, frames_to_array
 
 def calc_emfid(model, emfid_file, B0, b_tip):
 
-    B_frames, NB, Nframes = read_emfiducials(emfid_file)
-
     frames, NB, Nf = read_emfiducials(emfid_file)
 
     # 1) Distortion-correct all marker observations
@@ -22,6 +20,6 @@ def calc_emfid(model, emfid_file, B0, b_tip):
         Tk = aruns_method(B0, arr_to_points(corr[k]))       # body -> EM base
         Rk = np.asarray(Tk.r.R, float)                              # (3,3)
         tk = np.asarray(Tk.p.points_3d(), float)                    # (3,)
-        tips[k] = Rk @ b_tip + tk
+        tips[k] = b_tip @ Rk.T + tk
 
     return tips
